@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
  //find user by ID
  router.get('/:id', ({ params }, res) => {
      User.findOne({ _id: params.id})
-     .polulate({
+     .populate({
          path: 'user',
          select: '__v'
      })
@@ -40,6 +40,7 @@ router.post('/', ({ body }, res) => {
     });
 }) 
 
+		
  //Update user by ID
 router.post('/:id', ({ params, body }, res) => {
      User.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true})
@@ -51,7 +52,7 @@ router.post('/:id', ({ params, body }, res) => {
 })
 
  //Delete user by ID
-router.delete('/:id', ({ params }, res) => {
+router.post('/:id', ({ params }, res) => {
      User.findOneAndDelete({ _id: params.id})
     .then(dbUserData => {
         if (!dbUserData) {
@@ -65,10 +66,17 @@ router.delete('/:id', ({ params }, res) => {
 
   //add a new friend to a user friend list
 router.post(':userId/friends/:friendId', ({ params}, res) => {
-    User.findOneAndUpdate({ _id: params.id})
+    User.findOneAndUpdate({ _id: params.id })
+    .then(({ _id }) => {
+        return User.findOneAndUpdate(
+            { _id: body.userId },
+            { $push: { friends: _id} },
+            { new: true }
+        );
+    })
     .then(dbUserData => {
         if (!dbUserData) {
-            res.status(404).json({ message: 'No friend with this id' });
+            res.status(404).json({ message: 'No User with this id' });
             return;
         }
     res.json(dbUserData);
@@ -76,17 +84,25 @@ router.post(':userId/friends/:friendId', ({ params}, res) => {
   .catch(err => res.status(400).json(err));
 })
 
+
 //delete a friend
-router.delete(':id/friends/:friendId', ({ params }, res) => {
-    User.destroy({ _id: params.id})
-   .then(dbUserData => {
-       if (!dbUserData) {
-           res.status(404).json({ message: 'No User with this id' });
-           return;
-       }
-   res.json(dbUserData);
- })
- .catch(err => res.status(400).json(err));
+router.delete(':userId/friends/:friendId', ({ params}, res) => {
+    User.findOneAndDelete({ _id: params.id })
+    .then(({ _id }) => {
+        return User.findOneAndUpdate(
+            { _id: body.userId },
+            { $pull: { friends: _id} },
+            { new: true }
+        );
+    })
+    .then(dbUserData => {
+        if (!dbUserData) {
+            res.status(404).json({ message: 'No User with this id' });
+            return;
+        }
+    res.json(dbUserData);
+  })
+  .catch(err => res.status(400).json(err));
 })
 
 module.exports = router;
