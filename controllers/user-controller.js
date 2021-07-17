@@ -23,7 +23,7 @@ const userController = {
                 path: 'thought',
                 select: '__v'
             })
-            then(dbUserData => res.json(dbUserData))
+            .then(dbUserData => res.json(dbUserData))
             .catch(err => {
                 console.log(err);
                 res.status(400).json(err);
@@ -61,6 +61,34 @@ const userController = {
                 res.json(dbUserData);
             })
             .catch(err => res.status(400).json(err));
+    },
+
+    //add a friend to user
+    addFriend({ params, body },res){
+        User.findOneAndUpdate(
+            { _id: params.Id },
+            { $push: { friends: body} },
+            {new: true }
+        )
+            .then(dbUserData => res.json(dbUserData))
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+            });
+    },
+
+    //delete a friend from user
+    deleteFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.Id },
+            { $pull: { friends: {friends: params.friends} } },
+            { new: true }
+        )
+            .then(dbUserData => res.json(dbUserData))
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+            });
     }
 
 
