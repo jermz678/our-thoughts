@@ -53,7 +53,7 @@ const thoughtController = {
     deleteThought({ params },res) {
         Thought.findOneAndDelete({ _id: params.id})
             .then(dbThoughtData => {
-                if (!dbThoughtrData) {
+                if (!dbThoughtData) {
                     res.status(404).json({ message: 'No Thought with this id' });
                     return;
                 }
@@ -65,12 +65,13 @@ const thoughtController = {
     //add a reaction
     addReaction({ params, body }, res) {
         Thought.findOneAndUpdate(
-            { id: params.thoughtId },
+            { _id: params.id },
             { $push: { reactions: body } },
             { new: true }      
         )
         .then(dbThoughtData => {
             res.json(dbThoughtData)
+            console.log(dbThoughtData)
         })
         .catch(err => res.json(err));
     },
@@ -78,11 +79,12 @@ const thoughtController = {
     //delete a reaction
     deleteReaction({ params }, res) {
         Thought.findOneAndUpdate(
-            {id: params.thoughtId },
+            {_id: params.id },
             { $pull: { reactions: {reactionId: params.reactionId} } },
             { new: true}
         )
         .then(dbThoughtData => {
+            console.log(params.reactionId)
             res.json(dbThoughtData)
         })
         .catch(err => res.json(err));
