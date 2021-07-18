@@ -8,4 +8,3 @@
 
 ## Here is a link for you to see how this is starting to come together!
 
-https://drive.google.com/file/d/12FE9Huq2PGlG1dSKDUdJgOQYYVy4OMhi/view
