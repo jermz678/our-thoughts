@@ -68,7 +68,7 @@ const userController = {
         User.findOneAndUpdate(
             { _id: params.Id },
             { $push: { friends: body} },
-            {new: true }
+            // {new: true }
         )
             .then(dbUserData => res.json(dbUserData))
             .catch(err => {
@@ -81,7 +81,7 @@ const userController = {
     deleteFriend({ params }, res) {
         User.findOneAndUpdate(
             { _id: params.Id },
-            { $pull: { friends: {friends: params.friends} } },
+            { $pull: { friends: {friends: params.friendsId} } },
             { new: true }
         )
             .then(dbUserData => res.json(dbUserData))

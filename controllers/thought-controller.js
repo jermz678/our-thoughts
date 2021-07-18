@@ -27,7 +27,7 @@ const thoughtController = {
         Thought.create(body)
         .then(({ _id }) => {
             return User.findOneAndUpdate(
-                { _id: params.userId },
+                { userId: params.userId },
                 { $push: { thoughts: _id} },
                 { new: true }
             );
@@ -61,6 +61,34 @@ const thoughtController = {
             })
             .catch(err => res.status(400).json(err));
     },
+
+    //add a reaction
+    addReaction({ params, body }, res) {
+        Thought.findOneAndUpdate(
+            { id: params.thoughtId },
+            { $push: { reactions: body } },
+            { new: true }      
+        )
+        .then(dbThoughtData => {
+            res.json(dbThoughtData)
+        })
+        .catch(err => res.json(err));
+    },
+
+    //delete a reaction
+    deleteReaction({ params }, res) {
+        Thought.findOneAndUpdate(
+            {id: params.thoughtId },
+            { $pull: { reactions: {reactionId: params.reactionId} } },
+            { new: true}
+        )
+        .then(dbThoughtData => {
+            res.json(dbThoughtData)
+        })
+        .catch(err => res.json(err));
+    }
 }
 
 module.exports = thoughtController;
+
+  
